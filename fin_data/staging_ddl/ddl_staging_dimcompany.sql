@@ -2,6 +2,7 @@
 DROP TABLE IF EXISTS staging.DimCompany;
 
 CREATE TABLE staging.DimCompany (
+  PK STRING,
   CompanyId STRING,
   CompanyName STRING,
   ExchangeId STRING

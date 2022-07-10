@@ -161,7 +161,7 @@ def get_eod_df(api_json):
     try:
         df = spark.createDataFrame(api_json, schema)
         df = df.withColumn('date', date_format(to_timestamp('date'), "yyyyMMdd"))
-        df = df.withColumn('pk', concat(df.symbol, lit('_'), df.date))
+        df = df.withColumn('pk', concat(df.symbol, lit('_'), df.exchange, lit('_'), df.date))
         df = df.withColumn('date', df.date.cast('int'))
         return df
     except Exception as error:
@@ -277,6 +277,7 @@ def get_company_df (api_json):
         df = (df.withColumn('exchangeMic', col('stock_exchange.mic'))
               .withColumn('exchangeAcronym', col('stock_exchange.acronym'))
               .drop('stock_exchange'))
+        df = df.withColumn('pk', concat(df.symbol, lit('_'), df.exchangeMic))
         return df
     except Exception as error:
         raise Exception(f"Function name: 'get_company_df', Error message: {error}")
@@ -656,8 +657,8 @@ def write_api_to_landing_fact_tables (access_key, base_url, exchanges, table_nam
     
     staging_table = table_name.replace('landing', 'staging')
     
-    companies = get_companies_per_exchange (exchanges)[:200]
-#     companies = get_companies_per_exchange (exchanges)
+#     companies = get_companies_per_exchange (exchanges)[:200]
+    companies = get_companies_per_exchange (exchanges)
     companies_count = len(companies)
     
     # Marketstack API has a limit of how many symbols (i.e. company codes) can be included in a single API request. 99 is chosen instead of 100 just to be on the safe side.
