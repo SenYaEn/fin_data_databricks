@@ -13,7 +13,8 @@ CREATE TABLE $landing_database_name.DimCompany (
   has_eod BOOLEAN,
   country STRING,
   exchangeMic STRING,
-  exchangeAcronym STRING,   
+  exchangeAcronym STRING,
+  pk STRING,
   dayId INT,
   runId INT
 )

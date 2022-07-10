@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS $landing_database_name.DimDate;
 CREATE TABLE $landing_database_name.DimDate (
     DateNum INT
   , `Date` DATE
+  , YearId INT
   , YearMonthNum INT
   , Calendar_Quarter STRING
   , MonthNum INT
@@ -27,7 +28,3 @@ CREATE TABLE $landing_database_name.DimDate (
 USING CSV
 OPTIONS (header 'true', delimiter '|')
 LOCATION '/mnt/lake/Landing/Date';
-
--- COMMAND ----------
-
-select * from $landing_database_name.DimDate

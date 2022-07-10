@@ -1,5 +1,5 @@
 -- Databricks notebook source
--- MAGIC %run Users/jan.strocki@hotmail.co.uk/finData/helper
+-- MAGIC %run fin_data/functions_master
 
 -- COMMAND ----------
 
@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS staging.DimDate;
 CREATE TABLE staging.DimDate (
     DateNum INT
   , `Date` DATE
+  , YearId INT
   , YearMonthNum INT
   , Calendar_Quarter STRING
   , MonthNum INT
@@ -36,6 +37,7 @@ LOCATION '/mnt/lake/Staging/DimDate';
 -- MAGIC column_mapping = {
 -- MAGIC                       "DateNum": "updates.DateNum",
 -- MAGIC                       "`Date`": "updates.`Date`",
+-- MAGIC                       "YearId": "updates.YearId",
 -- MAGIC                       "YearMonthNum": "updates.YearMonthNum",
 -- MAGIC                       "Calendar_Quarter": "updates.Calendar_Quarter",
 -- MAGIC                       "MonthNum": "updates.MonthNum",
