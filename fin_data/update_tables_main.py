@@ -3,8 +3,8 @@
 
 # COMMAND ----------
 
-file_path = 'Config/config_dim_tables.yml'
-notebook_base_path = '/'
+file_path = dbutils.widgets.get('file_path')
+notebook_base_path = dbutils.widgets.get('notebook_base_path')
 
 # COMMAND ----------
 
