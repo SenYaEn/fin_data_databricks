@@ -4,7 +4,7 @@ This repository serves for extraction, transformation, and loading Marketstack A
 
 Marketstack API documentation can be found [here](https://marketstack.com/documentation)
 
-## Software
+## Infrastructure
 The solution runs within the Azure platform and uses the following resources:
 1. Databricks
 2. Data Lake
@@ -18,12 +18,12 @@ The solution runs within the Azure platform and uses the following resources:
 
 Below is a High-Level solution architechture diagram.
 
-![image](https://user-images.githubusercontent.com/58121577/181600807-8ddcfa2e-7dc7-42ec-83ae-a6b4181d1b7a.png)
+![image](https://user-images.githubusercontent.com/58121577/181736290-f7e04945-de73-4fdf-b85f-fd895c38fcf9.png)
 
 ### Databricks
 A standard Cluster will suffice to run the solution and can be scaled up depending on the processing speed requirements. For a demo run the following cluster type was used:
 
-![image](https://user-images.githubusercontent.com/58121577/181119944-7d6ad725-8266-4928-a8b8-cb3b30ea064e.png)
+![image](https://user-images.githubusercontent.com/58121577/181736531-e285017f-b806-4605-8381-a0531cb90464.png)
 
 The following initiation script needs to run when the cluster is started:
 
@@ -157,7 +157,7 @@ There are three conceptual layers data goes through:
 
 In *Landing* each table has it's folder and each folder is further split into dayId and runId folders. In the example below the Dividends API call was performed 4 times on a given date (20220703):
 
-![image](https://user-images.githubusercontent.com/58121577/181633145-530c1bc4-3e31-4001-8148-7e18eb29e19e.png)
+![image](https://user-images.githubusercontent.com/58121577/181736934-96f79e23-0ef4-4d44-a26e-20aaafbc3dd7.png)
 
 Within the Landing layer data might be duplicated across dayId and runId folders. When data is merged into a Staged table only unique rows are selected (more details will be provided further).
 
@@ -191,7 +191,7 @@ All Landing tables are partitioned by *dayId* and *runId*.
 
 In the Staging layer some tables are partitioned by a business key and some tables are not partitioned at all. In the example below FactEod table is partitioned by Date key:
 
-![image](https://user-images.githubusercontent.com/58121577/181637411-22667224-193f-4ae9-b46d-04963c17bc2a.png)
+![image](https://user-images.githubusercontent.com/58121577/181737255-5b23f46f-63a3-4c71-ac07-68d25012c765.png)
 
 All Staging tables are in Delta Lake format and are also defined in [SQL DDL](https://github.com/SenYaEn/fin_data_databricks/tree/main/fin_data/staging_ddl):
 
@@ -273,6 +273,12 @@ CREATE VIEW analytics.vw_DimExchange AS
 )
 ```
 
+## Conceptual Design
+This section covers the conceptual design of the Staging layer as all the dables in this layer are of Delta Lake type which has the strongest Schema Validation built in comparing to other types of tables.
+
+#### FactEod relations
+
+![image](https://user-images.githubusercontent.com/58121577/181748350-81ed4999-828f-4945-a36a-53748b85d67c.png)
 
 
 ***.....the rest of the documentation is being worked on and will be added soon...***
