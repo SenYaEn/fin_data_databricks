@@ -25,7 +25,7 @@ A standard Cluster will suffice to run the solution and can be scaled up dependi
 
 ![image](https://user-images.githubusercontent.com/58121577/181736531-e285017f-b806-4605-8381-a0531cb90464.png)
 
-The following initiation script needs to run when the cluster is started:
+The following initiation script needs to run every time the cluster is started:
 
 ```powershell
 pip install aiohttp==3.8.1
@@ -55,7 +55,7 @@ Key Vault is used within this solution to store the API key, Data Lake credentia
 Data Factory is used only for scheduling and triggering a single Databricks notebook which runs a full cycle ETL - from performing API calls to merging the data into Staging Delta tables. Data Factory code is linked to a separate [repo](https://github.com/SenYaEn/fin_data_adf).
 
 ### Power BI
-Power BI is a potential consumer of the Fact and Dimention tables produced by this solution. Below are some sample Power BI dashboards that could be built using the data:
+Power BI is a potential consumer of the Fact and Dimention tables produced by this solution. Below are some sample Power BI dashboards that could be built using the data. Implementation of the Poser BI dashboards is outside of the scope of this repo.
 
 ![image](https://user-images.githubusercontent.com/58121577/181608305-86363456-0212-429f-bd35-c1b3a7e44f3f.png)
 
@@ -280,5 +280,10 @@ This section covers the conceptual design of the Staging layer as all the dables
 
 ![image](https://user-images.githubusercontent.com/58121577/181748350-81ed4999-828f-4945-a36a-53748b85d67c.png)
 
+#### FactDividends relations
 
-***.....the rest of the documentation is being worked on and will be added soon...***
+![image](https://user-images.githubusercontent.com/58121577/181914148-be005dd7-2333-4f41-8898-2f90a102aa70.png)
+
+#### FactSplits relations
+
+![image](https://user-images.githubusercontent.com/58121577/181914324-229b591b-4fd1-4267-9462-7bceb5e804c7.png)
