@@ -1,0 +1,116 @@
+name: Databricks-CI-CD
+on:
+  workflow_dispatch:
+    inputs:
+      GIT_NOTEBOOK_PATH:
+        description: 'Notebooks Relative Path in Git'
+        required: true
+        default: 'notebooks/fin_data'
+
+      NOTEBOOK_DEPLOYMENT_PATH:
+        description: 'Notebooks Deployment Path to Databricks'
+        required: true
+        default: '/fin_data'
+
+      RESOURCE_GROUP:
+        description: 'Resource Group Name'
+        required: true
+        default: 'pet_projects'
+
+      WORKSPACE_NAME:
+        description: 'Databricks workspace name'
+        required: true
+        default: 'dataprocessing'
+
+      KEY_VAULT_NAME:
+        description: 'KeyVault name'
+        required: true
+        default: 'keyVaultallEnv'
+
+
+jobs:
+#############################################################
+# Builds the code
+# This is packaging up the files from Git to the Artifacts files
+#############################################################
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+    # Display the event that triggered the workflow
+    - run: echo "The job was triggered by a ${{ github.event_name }} event."
+      
+    # Runner information
+    - run: echo "This job is now running on a ${{ runner.os }} server hosted by GitHub"
+      
+    # Information about the repository and branch
+    - run: echo "The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+
+    # Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v2    
+
+    - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+
+    - run: echo "Your repository has been copied to the path ${{ github.workspace }} on the runner."
+
+    # Publish Artifact: Databricks-Notebooks
+    - name: 'Publish Artifact: Databricks-Notebooks' 
+      uses: actions/upload-artifact@v2
+      with:
+        name: 'notebooks'
+        path: '${{ github.workspace }}/notebooks'
+
+    # Publish Artifact: Databricks-Deployment-Scripts
+    - name: 'Publish Artifact: Databricks-Deployment-Scripts' 
+      uses: actions/upload-artifact@v2
+      with:
+        name: 'deployment-scripts'
+        path: '${{ github.workspace }}/deployment-scripts'  
+
+#############################################################
+# Deploy
+#############################################################
+  Deploy:
+    needs: Build
+    runs-on: ubuntu-latest
+    env:
+      resourceGroupName: '${{ github.event.inputs.RESOURCE_GROUP }}'
+      databricksWorkspaceName: '${{ github.event.inputs.WORKSPACE_NAME }}'
+      keyVaultName: '${{ github.event.inputs.KEY_VAULT_NAME }}'
+
+    steps:
+    # Download Artifact: Databricks-Notebooks
+    - name: 'Download Artifact: Databricks-Notebooks' 
+      uses: actions/download-artifact@v2
+      with:
+        name: 'notebooks'
+        path: ${{ github.workspace }}/notebooks
+
+    # Download Artifact: Deployment Scripts
+    - name: 'Download Artifact: Deployment Scripts' 
+      uses: actions/download-artifact@v2
+      with:
+        name: 'deployment-scripts'
+        path: ${{ github.workspace }}/deployment-scripts
+
+    # Login to Azure
+    - name: Login via Az module
+      uses: azure/login@v1.1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    # Download KeyVault Secrets
+    - name: Download KeyVault Secrets
+      uses: Azure/get-keyvault-secrets@v1.0
+      if: ${{ github.event.inputs.MODE == 'Databricks' }}
+      with:
+        keyvault: ${{ env.keyVaultName }}
+        secrets: 'databricks-dev-ops-subscription-id,databricks-dev-ops-tenant-id,databricks-dev-ops-client-id,databricks-dev-ops-client-secret'
+      id: databricksSecretAction
+
+    # Deploy Databricks Notebooks
+    - name: Deploy Databricks Notebooks
+      run: |
+        cd "$GITHUB_WORKSPACE/${{ github.event.inputs.GIT_NOTEBOOK_PATH }}"
+        chmod +x $GITHUB_WORKSPACE/deployment-scripts/deploy-notebooks.sh
+        $GITHUB_WORKSPACE/deployment-scripts/deploy-notebooks.sh ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-tenant-id }} ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-client-id }} ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-client-secret }} ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-subscription-id }} ${{ env.resourceGroupName }} ${{ env.databricksWorkspaceName }} ${{ github.event.inputs.NOTEBOOK_DEPLOYMENT_PATH }}
