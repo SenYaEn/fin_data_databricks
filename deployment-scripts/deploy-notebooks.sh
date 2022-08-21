@@ -9,7 +9,7 @@ resourceGroup=$5
 workspaceName=$6
 notebookPathUnderWorkspace==$7
 
-azure_databricks_resource_id="2ff814a6-3304-4ab8-85cb-cd0e6f879c1d" # This is a static value
+azure_databricks_resource_id="2ff814a6-3304-4ab8-85cb-cd0e6f879c1d"
 resourceId="/subscriptions/$subscription_id/resourceGroups/$resourceGroup/providers/Microsoft.Databricks/workspaces/$workspaceName"
 
 ######################################################################################
@@ -51,7 +51,7 @@ curl -X POST https://$workspaceUrl/api/2.0/workspace/delete \
     -H "X-Databricks-Azure-Workspace-Resource-Id: $resourceId" \
     -H "Content-Type: application/json" \
     --data "$DELETION_JSON"
-	
+
 ######################################################################################
 # Recusively Create Paths 
 ######################################################################################
