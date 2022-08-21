@@ -22,11 +22,6 @@ on:
         required: true
         default: 'dataprocessing'
 
-      KEY_VAULT_NAME:
-        description: 'KeyVault name'
-        required: true
-        default: 'keyVaultallEnv'
-
 
 jobs:
 #############################################################
@@ -88,23 +83,9 @@ jobs:
         name: 'deployment-scripts'
         path: ${{ github.workspace }}/deployment-scripts
 
-    # Login to Azure
-    - name: Login via Az module
-      uses: azure/login@v1.1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    # Download KeyVault Secrets
-    - name: Download KeyVault Secrets
-      uses: Azure/get-keyvault-secrets@v1.0
-      with:
-        keyvault: ${{ github.event.inputs.KEY_VAULT_NAME }}
-        secrets: 'databricks-dev-ops-subscription-id,databricks-dev-ops-tenant-id,databricks-dev-ops-client-id,databricks-dev-ops-client-secret'
-      id: databricksSecretAction
-
     # Deploy Databricks Notebooks
     - name: Deploy Databricks Notebooks
       run: |
         cd "$GITHUB_WORKSPACE/${{ github.event.inputs.GIT_NOTEBOOK_PATH }}"
         chmod +x $GITHUB_WORKSPACE/deployment-scripts/deploy-notebooks.sh
-        $GITHUB_WORKSPACE/deployment-scripts/deploy-notebooks.sh ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-tenant-id }} ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-client-id }} ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-client-secret }} ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-subscription-id }} ${{ github.event.inputs.RESOURCE_GROUP }} ${{ github.event.inputs.WORKSPACE_NAME }} ${{ github.event.inputs.NOTEBOOK_DEPLOYMENT_PATH }}
+        $GITHUB_WORKSPACE/deployment-scripts/deploy-notebooks.sh ${{ secrets.AZURE_TENANT_ID }} ${{ secrets.AZURE_CLIENT_ID }} ${{ secrets.AZURE_CLIENT_SECRET }} ${{ secrets.AZURE_SUBSCRIPTION_ID }} ${{ github.event.inputs.RESOURCE_GROUP }} ${{ github.event.inputs.WORKSPACE_NAME }} ${{ github.event.inputs.NOTEBOOK_DEPLOYMENT_PATH }}
