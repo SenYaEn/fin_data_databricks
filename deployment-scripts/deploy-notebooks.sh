@@ -7,7 +7,7 @@ client_secret=$3
 subscription_id=$4
 resourceGroup=$5
 workspaceName=$6
-notebookPathUnderWorkspace==$7
+notebookPathUnderWorkspace=$7
 
 azure_databricks_resource_id="2ff814a6-3304-4ab8-85cb-cd0e6f879c1d"
 resourceId="/subscriptions/$subscription_id/resourceGroups/$resourceGroup/providers/Microsoft.Databricks/workspaces/$workspaceName"
