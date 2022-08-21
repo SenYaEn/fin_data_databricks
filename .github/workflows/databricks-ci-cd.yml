@@ -73,11 +73,6 @@ jobs:
   Deploy:
     needs: Build
     runs-on: ubuntu-latest
-    env:
-      resourceGroupName: '${{ github.event.inputs.RESOURCE_GROUP }}'
-      databricksWorkspaceName: '${{ github.event.inputs.WORKSPACE_NAME }}'
-      keyVaultName: '${{ github.event.inputs.KEY_VAULT_NAME }}'
-
     steps:
     # Download Artifact: Databricks-Notebooks
     - name: 'Download Artifact: Databricks-Notebooks' 
@@ -103,7 +98,7 @@ jobs:
     - name: Download KeyVault Secrets
       uses: Azure/get-keyvault-secrets@v1.0
       with:
-        keyvault: ${{ env.keyVaultName }}
+        keyvault: ${{ github.event.inputs.KEY_VAULT_NAME }}
         secrets: 'databricks-dev-ops-subscription-id,databricks-dev-ops-tenant-id,databricks-dev-ops-client-id,databricks-dev-ops-client-secret'
       id: databricksSecretAction
 
@@ -112,4 +107,4 @@ jobs:
       run: |
         cd "$GITHUB_WORKSPACE/${{ github.event.inputs.GIT_NOTEBOOK_PATH }}"
         chmod +x $GITHUB_WORKSPACE/deployment-scripts/deploy-notebooks.sh
-        $GITHUB_WORKSPACE/deployment-scripts/deploy-notebooks.sh ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-tenant-id }} ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-client-id }} ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-client-secret }} ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-subscription-id }} ${{ env.resourceGroupName }} ${{ env.databricksWorkspaceName }} ${{ github.event.inputs.NOTEBOOK_DEPLOYMENT_PATH }}
+        $GITHUB_WORKSPACE/deployment-scripts/deploy-notebooks.sh ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-tenant-id }} ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-client-id }} ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-client-secret }} ${{ steps.databricksSecretAction.outputs.databricks-dev-ops-subscription-id }} ${{ github.event.inputs.RESOURCE_GROUP }} ${{ github.event.inputs.WORKSPACE_NAME }} ${{ github.event.inputs.NOTEBOOK_DEPLOYMENT_PATH }}
